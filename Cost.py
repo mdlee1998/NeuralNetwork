@@ -3,6 +3,31 @@ from Activations import Softmax
 
 class Cost:
 
+    def regularization_cost(self, layer):
+
+        regularization_cost = 0
+
+        if layer.weight_regularizer_l1 > 0:
+            regularization_cost += layer.weight_regularizer_l1 * \
+                                   np.sum(np.abs(layer.weights))
+
+        if layer.weight_regularizer_l2 > 0:
+            regularization_cost += layer.weight_regularizer_l2 * \
+                                   np.sum(layer.weights *
+                                          layer.weights)
+
+        if layer.bias_regularizer_l1 > 0:
+            regularization_cost += layer.bias_regularizer_l1 * \
+                                   np.sum(np.abs(layer.biases))
+
+        if layer.bias_regularizer_l2 > 0:
+            regularization_cost += layer.bias_regularizer_l2 * \
+                                   np.sum(layer.biases *
+                                          layer.biases)
+
+        return regularization_cost
+
+
     def calc(self, output, true_y):
 
         sample_costs = self.forwardProp(output, true_y)
@@ -52,7 +77,7 @@ class Softmax_CategoricalCrossentropy(Cost):
 
     def __init__(self):
         self.activation = Softmax()
-        self.loss = CategoricalCrossentropy()
+        self.cost = CategoricalCrossentropy()
 
     def forwardProp(self, input, true_y):
 
@@ -60,7 +85,7 @@ class Softmax_CategoricalCrossentropy(Cost):
 
         self.output = self.activation.output
 
-        return self.loss.calc(self.output, true_y)
+        return self.cost.calc(self.output, true_y)
 
     def backProp(self, dvalues, true_y):
 
